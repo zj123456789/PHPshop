@@ -24,7 +24,6 @@ class Article extends \yii\db\ActiveRecord
     {
         return 'article';
     }
-
     /**
      * @inheritdoc
      */
@@ -34,10 +33,9 @@ class Article extends \yii\db\ActiveRecord
             [['article_category_id', 'sort', 'status', 'create_time'], 'integer'],
             ['name','string','max'=>20],
             ['intro','string','max'=>255],
-            ['sort','integer'],
+            [['name','intro','sort'],'required']
         ];
     }
-
     /**
      * @inheritdoc
      */
@@ -51,9 +49,10 @@ class Article extends \yii\db\ActiveRecord
             'sort' => '排序',
             'status' => '状态',
             'create_time' => '创建时间',
+
         ];
     }
     public function getArticleCategory(){
-        return $this->hasOne(ArticleCategory::className(),['id'=>'category_id']);
+        return $this->hasOne(ArticleCategory::className(),['id'=>'article_category_id']);
     }
 }

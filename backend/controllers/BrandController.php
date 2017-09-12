@@ -6,6 +6,7 @@ use backend\models\Brand;
 use yii\data\Pagination;
 use yii\web\UploadedFile;
 use flyok666\uploadifive\UploadAction;
+use flyok666\qiniu\Qiniu;
 
 class BrandController extends \yii\web\Controller
 {
@@ -14,10 +15,10 @@ class BrandController extends \yii\web\Controller
         $count = Brand::find();
         //实例化一个分页根据类
         $pager = new Pagination([
-            'totalCount'=>$count->count(),//总条数
+            'totalCount'=>$count->where(['!=','status','-1'])->count(),//总条数
             'defaultPageSize'=>3 //每页多少条
         ]);
-        $models = $count->limit($pager->limit)->offset($pager->offset)->all();
+        $models = $count->limit($pager->limit)->offset($pager->offset)->where(['!=','status','-1'])->all();
         return $this->render('index',['models'=>$models,'pager'=>$pager]);
     }
 
@@ -39,6 +40,7 @@ class BrandController extends \yii\web\Controller
                 $model->file->saveAs(\yii::getAlias('@webroot').$logo,false);
                 //将路径保存到数据库
                 $model->logo = $logo;*/
+
                 $model->save();
                 \yii::$app->session->setFlash('seccess','添加成功');
                 return $this->redirect(['brand/index']);
@@ -78,20 +80,21 @@ class BrandController extends \yii\web\Controller
         return $this->render('add',['model'=>$model]);
     }
     //删除
-    public function actionDelete($id){
+    public function actionDelete(){
+        $id = \Yii::$app->request->post('id');
         $model = Brand::findOne(['id'=>$id]);
         $model->status = -1;
         if($model->save(false)){
-            \Yii::$app->session->setFlash('seccess','删除成功');
-            return $this->redirect(['brand/index']);
+           return 'true';
         }else{
-            \Yii::$app->session->setFlash('warning','删除失败');
+            return 'false';
         }
     }
 
     //文件上传 与 文本编辑
     public function actions() {
         return [
+            //七牛云
             's-upload' => [
                 'class' => UploadAction::className(),
                 'basePath' => '@webroot/upload',
@@ -128,13 +131,19 @@ class BrandController extends \yii\web\Controller
                 'afterValidate' => function (UploadAction $action) {},
                 'beforeSave' => function (UploadAction $action) {},
                 'afterSave' => function (UploadAction $action) {
-                    $action->output['fileUrl'] = $action->getWebUrl();//返回文件路径
+                    //$action->output['fileUrl'] = $action->getWebUrl();//返回文件路径
                     //$action->getFilename(); // "image/yyyymmddtimerand.jpg"
-                    //$action->getWebUrl(); //  "baseUrl + filename, /upload/image/yyyymmddtimerand.jpg"
-                   // $action->getSavePath(); // "/var/www/htdocs/upload/image/yyyymmddtimerand.jpg"
+                    //$action->getWebUrl(); 相对路径//  "baseUrl + filename, /upload/image/yyyymmddtimerand.jpg"
+                   // $action->getSavePath(); 绝对路径// "/var/www/htdocs/upload/image/yyyymmddtimerand.jpg"
+                    $qiniu = new Qiniu(\yii::$app->params['qiniuyun']);
+                    $key = $action->getWebUrl();
+                    $file = $action->getSavePath();
+                    $qiniu->uploadFile($file,$key);
+                    $url = $qiniu->getLink($key);
+                    $action->output['fileUrl'] = $url;
                 },
             ],
-
+            //文本编辑
              'upload' => [
                  'class' => 'kucha\ueditor\UEditorAction',
                  //配置
@@ -146,5 +155,26 @@ class BrandController extends \yii\web\Controller
              ]
         ];
     }
+
+    //七牛云测试
+    public function actionQiniu(){
+
+        $config = [
+            'accessKey'=>'rfK_FdgR9n4hWzdiIMVcKvtnZ0W7mN8GNjDdxXjH',
+            'secretKey'=>'U6dEwwnbDC8LHw3Ob14FpvVnaSAbfxG1Gq3OON-l',
+            'domain'=>'http://ow0alv4x0.bkt.clouddn.com/',
+            'bucket'=>'PHPzhu',
+            'area'=>Qiniu::AREA_HUADONG
+        ];
+
+        /*$qiniu = new Qiniu(\yii::$app->params['qiniuyun']);
+        $key = $action->getWebUrl();
+        $file = $action->getSavePath();
+
+        $qiniu->uploadFile($file,$key);
+        $url = $qiniu->getLink($key);
+        $action->output['fileUrl'] = $url;*/
+    }
+
 }
 

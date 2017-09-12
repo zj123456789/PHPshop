@@ -13,7 +13,7 @@
         <th>操作</th>
     </tr>
     <?php foreach ($models as $model):?>
-        <tr>
+        <tr data_id="<?=$model->id?>">
             <td><?=$model->id?></td>
             <td><?=$model->name?></td>
             <td><?php
@@ -29,13 +29,44 @@
             <td><?=$model->sort?></td>
             <td>
                 <a href="<?=\yii\helpers\Url::to(['brand/edit','id'=>$model->id])?>" class="btn btn-warning">修改</a>
-                <a href="<?=\yii\helpers\Url::to(['brand/delete','id'=>$model->id])?>" class="btn btn-danger" data-confirm="你确定删除吗？">删除</a>
+                <a href="javascript:;" class="btn btn-danger del" >删除</a>
             </td>
         </tr>
     <?php endforeach;?>
 </table>
 
-<?php echo \yii\widgets\LinkPager::widget([
+<?php
+/**
+ * @var $this \yii\web\View
+ */
+    $url = yii\helpers\Url::to(['brand/delete']);
+    $this->registerJs(new \yii\web\JsExpression(
+            <<<JS
+            $('.del').click(function() {
+              if(confirm('你确定要删除吗')){
+                  var tr = $(this).closest('tr');
+                  var id = tr.attr('data_id');
+                  $.post("{$url}",{id:id},function(data) {
+                    if(data=='true'){
+                        alert('删除成功!');
+                        //移除节点
+                        tr.hide('slow');
+                    }else {
+                        alert('删除失败!')
+                    }
+                  });
+              }
+            })
+JS
+
+    ));
+
+
+//data-confirm="你确定删除吗？"
+
+
+
+echo \yii\widgets\LinkPager::widget([
         'pagination'=>$pager,
     'firstPageLabel'=>'第一页',
     'lastPageLabel'=>'最后一页',

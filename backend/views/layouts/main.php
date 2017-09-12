@@ -40,6 +40,8 @@ AppAsset::register($this);
         ['label' => '品牌', 'url' => ['/brand/index']],
         ['label' => '文章分类', 'url' => ['/article-category/index/']],
         ['label' => '文章', 'url' => ['/article/index/']],
+        ['label' => '商品分类', 'url' => ['/goods-category/index/']],
+        ['label' => '商品列表', 'url' => ['/goods/index/']],
     ];
 
     if (Yii::$app->user->isGuest) {

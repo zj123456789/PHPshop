@@ -11,10 +11,10 @@ class ArticleCategoryController extends Controller{
          $count = \backend\models\ArticleCategory::find();
         //实例化一个分页根据类
         $pager = new Pagination([
-            'totalCount'=>$count->count(),//总条数
+            'totalCount'=>$count->where(['!=','status','-1'])->count(),//总条数
             'defaultPageSize'=>3 //每页多少条
         ]);
-        $models = $count->limit($pager->limit)->offset($pager->offset)->all();
+        $models = $count->limit($pager->limit)->offset($pager->offset)->where(['!=','status','-1'])->all();
         return $this->render('index',['models'=>$models,'pager'=>$pager]);
     }
     //添加文章
@@ -44,7 +44,7 @@ class ArticleCategoryController extends Controller{
             $model->load($request->post());
             if($model->validate()){
                 $model->save();
-                \yii::$app->session->setFlash('seccess','添加成功');
+                \yii::$app->session->setFlash('seccess','修改成功');
                 return $this->redirect(['article-category/index']);
             }else{
                 var_dump($model->getErrors());
@@ -54,14 +54,14 @@ class ArticleCategoryController extends Controller{
         return $this->render('add',['model'=>$model]);
     }
     //删除文章
-    public function actionDelete($id){
+    public function actionDelete(){
+        $id = \Yii::$app->request->post('id');
         $model = ArticleCategory::findOne(['id'=>$id]);
         $model->status = -1;
         if($model->save(false)){
-            \Yii::$app->session->setFlash('seccess','删除成功');
-            return $this->redirect(['article-category/index']);
+            return 'true';
         }else{
-            \Yii::$app->session->setFlash('warning','删除失败');
+            return 'false';
         }
     }
 }
