@@ -28,7 +28,7 @@ function(file, data, response) {
                 //用户选择图片后回显在页面
                // $('#img').attr('src',data.fileUrl);
                  var html='<tr data-id="'+data.id+'">';
-                    html += '<td><img src="'+data.fileUrl+'" /></td>';
+                    html += '<td><img src="'+data.fileUrl+'" style="width: 50px;height: 50px"/></td>';
                     html += '<td><button type="button" class="btn btn-danger del_btn">删除</button></td>';
                     html += '</tr>';
                  $("table").append(html);

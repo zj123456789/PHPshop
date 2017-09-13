@@ -27,7 +27,7 @@ intro	text()	简介*/
             'rgt'=>$this->integer()->comment('右值'),
             'depth'=>$this->integer()->comment('层级'),
             'name'=>$this->string(50)->comment('名称'),
-            'parent_if'=>$this->integer()->comment('上级分类id'),
+            'parent_id'=>$this->integer()->comment('上级分类id'),
             'intro'=>$this->text()->comment('简介')
 
         ]);

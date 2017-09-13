@@ -51,12 +51,16 @@ class GoodsController extends \yii\web\Controller
                 $GoodsDay = GoodsDayCount::findOne(['day'=>$date]);
 //                var_dump($GoodsDay);exit;
                 if($GoodsDay){//添加过
-                    //得到今天添加的条数
-                    $count = $GoodsDay->count;
-                    //自身加一
-                    $GoodsDay->count = $count+1;
-                    //不同的拼接sn方法
-                    if($count<10){
+                    //条数加一
+                   $GoodsDay->count = $GoodsDay->count+1;
+                   //将数据库的时间转化成时间戳
+                   $time = strtotime($GoodsDay->day);
+                   //得到今天的时间格式
+                   $day = date('Ymd',$time);
+                    //拼接sn
+                    $sn = str_pad($GoodsDay->count,4,'0',STR_PAD_LEFT);
+                    $model->sn = $day.$sn;
+                   /* if($count<10){
                         $model->sn = $date.'000'.($count+1);
                     }elseif ($count<100 && $count>=10){
                         $model->sn = $date.'00'.($count+1);
@@ -64,19 +68,25 @@ class GoodsController extends \yii\web\Controller
                         $model->sn = $date.'0'.($count+1);
                     }else{
                         $model->sn = $date .($count+1);
-                    }
+                    }*/
                 }else{//今天没添加过商品
                     //添加条数
                     $GoodsDay = new GoodsDayCount();
                     $GoodsDay->count = 1;
                     //添加时间到商品时间表
                     $GoodsDay->day = $date;
-                    $model->sn = $date .'0001';
+                    //将数据库的时间转化成时间戳
+                    $time = strtotime($GoodsDay->day);
+                    //得到今天的时间格式
+                    $day = date('Ymd',$time);
+                    $model->sn = $day .'0001';
                 }
-                $GoodsDay->save();
+
                 //保存商品表
                 $model->create_time = time();
+//                var_dump($model);exit;
                 $model->save();
+                $GoodsDay->save();
                 //保存到详情表
                 $model_intro->goods_id=$model->id;
                 $model_intro->save();
@@ -87,20 +97,21 @@ class GoodsController extends \yii\web\Controller
                 exit;
             }
         }
-
-        //商品分类下拉框回显
-        $category = GoodsCategory::find()->all();
+        //商品分类zTree
+        $category = GoodsCategory::find()->select(['id','name','parent_id'])->asArray()->all();
+        //添加一个顶级分类节点
+        $parentCategory = ['id'=>0,'name'=>'顶级分类','parent_id'=>0];
+        array_unshift($category,$parentCategory);
+        //转成json字符串
+        $goods_category = json_encode($category);
+        $models = new GoodsCategory();
         //品牌下拉框回显
         $Brand = Brand::find()->where(['!=','status','-1'])->all();
-        $GC = [];
-        foreach ($category as $value){
-            $GC[$value->id] = str_repeat('--',$value->depth).$value->name;
-        }
         $Bd = [];
         foreach ($Brand as $value){
             $Bd[$value->id] = $value->name;
         }
-        return $this->render('add',['model'=>$model,'model_intro'=>$model_intro,'GC'=>$GC,'Bd'=>$Bd]);
+        return $this->render('add',['model'=>$model,'models'=>$models,'model_intro'=>$model_intro,'goods_category'=>$goods_category,'Bd'=>$Bd]);
     }
     //修改商品
     public function actionEdit($id){
@@ -121,19 +132,22 @@ class GoodsController extends \yii\web\Controller
             }
         }
         //商品分类下拉框回显
-        $category = GoodsCategory::find()->all();
+        //商品分类下拉框回显
+        $category = GoodsCategory::find()->select(['id','name','parent_id'])->asArray()->all();
+        //添加一个顶级分类节点
+        $parentCategory = ['id'=>0,'name'=>'顶级分类','parent_id'=>0];
+        array_unshift($category,$parentCategory);
+        //转成json字符串
+        $goods_category = json_encode($category);
+        $models =GoodsCategory::findOne(['id'=>$model->goods_category_id]);
         //品牌下拉框回显
         $Brand = Brand::find()->where(['!=','status','-1'])->all();
-        $GC = [];
-        foreach ($category as $value){
-            $GC[$value->id] = str_repeat('--',$value->depth).$value->name;
-        }
         $Bd = [];
         foreach ($Brand as $value){
             $Bd[$value->id] = $value->name;
         }
 
-        return $this->render('add',['model'=>$model,'GC'=>$GC,'Bd'=>$Bd,'model_intro'=>$model_intro]);
+        return $this->render('add',['model'=>$model,'models'=>$models,'goods_category'=>$goods_category,'Bd'=>$Bd,'model_intro'=>$model_intro]);
     }
     //删除
     public function actionDelete(){

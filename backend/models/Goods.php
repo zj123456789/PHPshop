@@ -39,6 +39,7 @@ class Goods extends \yii\db\ActiveRecord
     {
         return [
             [['goods_category_id', 'brand_id', 'stock', 'is_on_sale', 'status', 'sort', 'create_time', 'view_times'], 'integer'],
+            [['name','goods_category_id','brand_id','stock','is_on_sale','status','sort'],'required'],
             [['market_price', 'shop_price'], 'number'],
             [['name', 'sn'], 'string', 'max' => 20],
             [['LOGO'], 'string', 'max' => 255],
