@@ -22,6 +22,15 @@ use yii\web\IdentityInterface;
  */
 class Admin extends \yii\db\ActiveRecord implements IdentityInterface
 {
+    public $password;
+    public $repassword;
+    public $newpassword;
+    public $oldpassword;
+    //添加管理员时使用
+    const SCENARIO_ADD = 'add';
+    //管理员自己修改密码时使用
+    const SCENARIO_EDIT = 'edit';
+
     /**
      * @inheritdoc
      */
@@ -29,19 +38,54 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return 'admin';
     }
-
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['status', 'created_at', 'updated_at'], 'required'],
-            [['status', 'created_at', 'updated_at', 'last_login_time'], 'integer'],
-            [['username', 'password', 'auth_key', 'password_reset', 'email', 'last_login_ip'], 'string', 'max' => 255],
+            [['username','status', 'email'], 'required'],
+            ['repassword', 'compare', 'compareAttribute'=>'password','on'=>[self::SCENARIO_ADD,self::SCENARIO_EDIT]],//验证两次密码是否一致
+            [['repassword','password'],'required','on'=>[self::SCENARIO_ADD,self::SCENARIO_EDIT]],//确认密码和密码
+            [['oldpassword'],'required','on'=>[self::SCENARIO_EDIT]],// 旧密码
+
+            ['newpassword','editpwd'],//调用该方法验证旧密码
+            [['status'], 'integer'],
+            ['username','unique','message'=>'用户名已存在'],
+            ['email','unique','message'=>'邮箱已存在'],
+            [['username', 'password', 'email'], 'string', 'max' => 255],
         ];
     }
-
+    //修改密码
+    public function editpwd(){
+        //数据库密码
+        $password_hash = $this->password_hash;
+        //输入旧密码
+        $oldpassword = Yii::$app->security->generatePasswordHash($this->oldpassword);
+//        var_dump($password);exit;
+        if($oldpassword != $password_hash){
+           return $this->addError('password','旧密码错误');
+        }
+    }
+    //添加修改
+    public function beforeSave($insert)
+    {
+        //$insert-----是否是添加
+        if($insert){
+            //添加
+            $this->created_at = time();
+            $this->auth_key = Yii::$app->security->generateRandomString();
+            $this->password_hash = Yii::$app->security->generatePasswordHash($this->password);
+        }else{
+            //修改
+            $this->updated_at = time();
+            $this->auth_key = Yii::$app->security->generateRandomString();
+            if($this->password != null){
+                $this->password_hash = Yii::$app->security->generatePasswordHash($this->password);
+            }
+        }
+        return parent::beforeSave($insert);
+    }
     /**
      * @inheritdoc
      */
@@ -55,10 +99,12 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             'password_reset' => '重置密码',
             'email' => '邮箱',
             'status' => '状态',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'created_at' => '创建时间',
+            'updated_at' => '修改时间',
             'last_login_time' => '最后登录时间',
             'last_login_ip' => '最后登录ip',
+            'repassword'=>'确认密码',
+            'oldpassword'=>'旧密码',
         ];
     }
 
@@ -111,7 +157,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getAuthKey()
     {
-        // TODO: Implement getAuthKey() method.
+        return $this->auth_key;
     }
 
     /**
@@ -124,6 +170,6 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function validateAuthKey($authKey)
     {
-        // TODO: Implement validateAuthKey() method.
+        return $authKey == $this->auth_key;
     }
 }

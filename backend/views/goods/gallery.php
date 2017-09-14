@@ -1,5 +1,6 @@
 <?php
-
+echo "<a href='index'class='btn btn-success'>返回列表</a>";
+echo "<hr>";
 echo \yii\helpers\Html::fileInput('test',null,['id'=>'test']);
 echo \flyok666\uploadifive\Uploadifive::widget([
     'url' => yii\helpers\Url::to(['s-gallery']),

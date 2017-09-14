@@ -12,12 +12,15 @@ return [
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
     'modules' => [],
+    //设置语言
+    'language'=>'zh-CN',
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'loginUrl'=>'http://admin.yii2shop.com/admin/login',
+            'identityClass' => \backend\models\Admin::className(),
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
         ],

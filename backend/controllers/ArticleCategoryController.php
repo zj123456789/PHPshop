@@ -2,6 +2,7 @@
 namespace backend\controllers;
 use backend\models\ArticleCategory;
 use yii\data\Pagination;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\UploadedFile;
 
@@ -12,9 +13,9 @@ class ArticleCategoryController extends Controller{
         //实例化一个分页根据类
         $pager = new Pagination([
             'totalCount'=>$count->where(['!=','status','-1'])->count(),//总条数
-            'defaultPageSize'=>3 //每页多少条
+            'defaultPageSize'=>6 //每页多少条
         ]);
-        $models = $count->limit($pager->limit)->offset($pager->offset)->where(['!=','status','-1'])->all();
+        $models = $count->limit($pager->limit)->offset($pager->offset)->where(['!=','status','-1'])->orderBy('id DESC')->all();
         return $this->render('index',['models'=>$models,'pager'=>$pager]);
     }
     //添加文章
@@ -64,4 +65,26 @@ class ArticleCategoryController extends Controller{
             return 'false';
         }
     }
+    //过滤
+    public function behaviors(){
+        return [
+            'acf'=>[
+                'class'=>AccessControl::className(),
+                'except'=>['login'],
+                'rules'=>[
+                    [
+                        'allow'=>true,//允许
+                        'actions'=>['login','index','captcha'],//操作
+                        'roles'=>['?']//未登录  @已登录
+                    ],
+                    [
+                        'allow'=>true,//允许
+                        'actions'=>[],//操作
+                        'roles'=>['@']//已登录
+                    ]
+                ],
+            ]
+        ];
+    }
+
 }

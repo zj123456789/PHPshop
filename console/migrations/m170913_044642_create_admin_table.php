@@ -15,7 +15,7 @@ class m170913_044642_create_admin_table extends Migration
         $this->createTable('admin', [
             'id' => $this->primaryKey(),
             'username'=>$this->string()->comment('用户名'),
-            'password'=>$this->string()->comment('密码'),
+            'password_hash'=>$this->string()->comment('密码'),
             'auth_key'=>$this->string()->comment(''),
             'password_reset'=>$this->string()->comment('重置密码'),
             'email'=>$this->string()->comment('邮箱'),

@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\Brand;
 use yii\data\Pagination;
+use yii\filters\AccessControl;
 use yii\web\UploadedFile;
 use flyok666\uploadifive\UploadAction;
 use flyok666\qiniu\Qiniu;
@@ -18,7 +19,7 @@ class BrandController extends \yii\web\Controller
             'totalCount'=>$count->where(['!=','status','-1'])->count(),//总条数
             'defaultPageSize'=>3 //每页多少条
         ]);
-        $models = $count->limit($pager->limit)->offset($pager->offset)->where(['!=','status','-1'])->all();
+        $models = $count->limit($pager->limit)->offset($pager->offset)->where(['!=','status','-1'])->orderBy('id DESC')->all();
         return $this->render('index',['models'=>$models,'pager'=>$pager]);
     }
 
@@ -101,18 +102,7 @@ class BrandController extends \yii\web\Controller
                 'baseUrl' => '@web/upload',
                 'enableCsrf' => true, // default
                 'postFieldName' => 'Filedata', // default
-                //BEGIN METHOD
-                //'format' => [$this, 'methodName'],
-                //END METHOD
-                //BEGIN CLOSURE BY-HASH
                 'overwriteIfExist' => true,
-               /* 'format' => function (UploadAction $action) {
-                    $fileext = $action->uploadfile->getExtension();
-                    $filename = sha1_file($action->uploadfile->tempName);
-                    return "{$filename}.{$fileext}";
-                },*/
-                //END CLOSURE BY-HASH
-                //BEGIN CLOSURE BY TIME
                 'format' => function (UploadAction $action) {
                     $fileext = $action->uploadfile->getExtension();
                     $filehash = sha1(uniqid() . time());
@@ -120,7 +110,6 @@ class BrandController extends \yii\web\Controller
                     $p2 = substr($filehash, 2, 2);
                     return "{$p1}/{$p2}/{$filehash}.{$fileext}";
                 },
-                //END CLOSURE BY TIME
                 'validateOptions' => [
                     'extensions' => ['jpg', 'png','gif','jpeg'],
                     'maxSize' => 2 * 1024 * 1024, //file size
@@ -175,6 +164,26 @@ class BrandController extends \yii\web\Controller
         $url = $qiniu->getLink($key);
         $action->output['fileUrl'] = $url;*/
     }
-
+    //过滤
+    public function behaviors(){
+        return [
+            'acf'=>[
+                'class'=>AccessControl::className(),
+                'except'=>['login'],
+                'rules'=>[
+                    [
+                        'allow'=>true,//允许
+                        'actions'=>['login','index','captcha'],//操作
+                        'roles'=>['?']//未登录  @已登录
+                    ],
+                    [
+                        'allow'=>true,//允许
+                        'actions'=>[],//操作
+                        'roles'=>['@']//已登录
+                    ]
+                ],
+            ]
+        ];
+    }
 }
 

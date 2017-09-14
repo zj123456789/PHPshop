@@ -12,6 +12,7 @@ use backend\models\GoodsSearch;
 use flyok666\qiniu\Qiniu;
 use flyok666\uploadifive\UploadAction;
 use yii\data\Pagination;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 
@@ -30,7 +31,7 @@ class GoodsController extends \yii\web\Controller
             'defaultPageSize'=>3
         ]);
 
-        $models = $Goods->limit($pager->limit)->offset($pager->offset)->all();
+        $models = $Goods->limit($pager->limit)->offset($pager->offset)->orderBy('id DESC')->all();
         return $this->render('index',['models'=>$models,'pager'=>$pager,'search'=>$Form]);
     }
     //添加商品
@@ -295,6 +296,27 @@ class GoodsController extends \yii\web\Controller
         }else{
             return 'false';
         }
+    }
+    //过滤
+    public function behaviors(){
+        return [
+            'acf'=>[
+                'class'=>AccessControl::className(),
+                'except'=>['login'],
+                'rules'=>[
+                    [
+                        'allow'=>true,//允许
+                        'actions'=>['login','index','captcha'],//操作
+                        'roles'=>['?']//未登录  @已登录
+                    ],
+                    [
+                        'allow'=>true,//允许
+                        'actions'=>[],//操作
+                        'roles'=>['@']//已登录
+                    ]
+                ],
+            ]
+        ];
     }
 
 }

@@ -35,26 +35,30 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
-        ['label' => '品牌', 'url' => ['/brand/index']],
-        ['label' => '文章分类', 'url' => ['/article-category/index/']],
-        ['label' => '文章', 'url' => ['/article/index/']],
-        ['label' => '商品分类', 'url' => ['/goods-category/index/']],
-        ['label' => '商品列表', 'url' => ['/goods/index/']],
-    ];
 
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => 'Login', 'url' => ['/admin/login']];
     } else {
+        $menuItems = [
+                ['label' => 'Home', 'url' => ['/site/index']],
+                ['label' => '品牌', 'url' => ['/brand/index']],
+                ['label' => '文章分类', 'url' => ['/article-category/index/']],
+                ['label' => '文章', 'url' => ['/article/index/']],
+                ['label' => '商品分类', 'url' => ['/goods-category/index/']],
+                ['label' => '商品列表', 'url' => ['/goods/index/']],
+                ['label' => '员工管理', 'url' => ['/admin/index/']],
+                ['label' => '修改密码', 'url' => ['/admin/edit-pwd/']],
+//                ['label' => 'Logout', 'url' => ['/admin/logout']],
+        ];
         $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
+            . Html::beginForm(['/admin/logout'], 'post')
             . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
+                'Logout (管理员:' . Yii::$app->user->identity->username . ')',
                 ['class' => 'btn btn-link logout']
             )
             . Html::endForm()
             . '</li>';
+
     }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
@@ -74,7 +78,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; My 京东 <?= date('Y') ?></p>
 
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>

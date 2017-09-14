@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\GoodsCategory;
 use yii\data\Pagination;
+use yii\filters\AccessControl;
 
 class GoodsCategoryController extends \yii\web\Controller
 {
@@ -13,9 +14,9 @@ class GoodsCategoryController extends \yii\web\Controller
         $count = GoodsCategory::find();
         $pager = new Pagination([
             'totalCount'=>$count->count(),
-            'defaultPageSize'=>3
+            'defaultPageSize'=>7
         ]);
-        $models = $count->limit($pager->limit)->offset($pager->offset)->all();
+        $models = $count->limit($pager->limit)->offset($pager->offset)->orderBy('depth ASC')->all();
         return $this->render('index',['models'=>$models,'pager'=>$pager]);
     }
     //添加分类
@@ -105,6 +106,27 @@ class GoodsCategoryController extends \yii\web\Controller
         $category = json_encode($category);
         //不加载布局文件
         return $this->renderPartial('aa',['category'=>$category]);
+    }
+    //过滤
+    public function behaviors(){
+        return [
+            'acf'=>[
+                'class'=>AccessControl::className(),
+                'except'=>['login'],
+                'rules'=>[
+                    [
+                        'allow'=>true,//允许
+                        'actions'=>['login','index','captcha'],//操作
+                        'roles'=>['?']//未登录  @已登录
+                    ],
+                    [
+                        'allow'=>true,//允许
+                        'actions'=>[],//操作
+                        'roles'=>['@']//已登录
+                    ]
+                ],
+            ]
+        ];
     }
 
 }

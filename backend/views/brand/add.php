@@ -6,8 +6,6 @@ $form = yii\bootstrap\ActiveForm::begin();
 echo $form->field($model,'name')->textInput();
 //==================
 //编辑器
-//echo $form->field($model,'intro')->hiddenInput();
-
 echo $form->field($model,'intro')->widget('kucha\ueditor\UEditor',[
    'name'=>'upload',
     'clientOptions' => [
@@ -52,25 +50,25 @@ function(file, errorCode, errorMsg, errorString) {
 EOF
         ),
         'onUploadComplete' => new JsExpression(<<<EOF
-function(file, data, response) {
-    data = JSON.parse(data);
-    if (data.error) {
-        console.log(data.msg);
-    } else {
-        console.log(data.fileUrl);
-        //将处理好的图片放入表单一起提交
-        $('#brand-logo').val(data.fileUrl);
-        //用户选择图片后回显在页面
-        $('#img').attr('src',data.fileUrl);
-    }
-}
+            function(file, data, response) {
+                data = JSON.parse(data);
+                if (data.error) {
+                    console.log(data.msg);
+                } else {
+                    console.log(data.fileUrl);
+                    //将处理好的图片放入表单一起提交
+                    $('#brand-logo').val(data.fileUrl);
+                    //用户选择图片后回显在页面
+                    $('#img').attr('src',data.fileUrl);
+                }
+            }
 EOF
         ),
     ]
 ]);
 //=====================================
 echo yii\bootstrap\Html::img($model->logo,['class'=>'img-circule','style'=>'width:80px','id'=>'img']);
-//echo $form->field($model,'file')->fileInput();
+
 echo $form->field($model,'sort')->textInput();
 echo yii\bootstrap\Html::submitButton('提交',['class'=>'btn btn-info']);
 //结束表单
