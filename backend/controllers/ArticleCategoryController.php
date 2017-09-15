@@ -59,7 +59,7 @@ class ArticleCategoryController extends Controller{
         $id = \Yii::$app->request->post('id');
         $model = ArticleCategory::findOne(['id'=>$id]);
         $model->status = -1;
-        if($model->save(false)){
+        if($model->save()){
             return 'true';
         }else{
             return 'false';

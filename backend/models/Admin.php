@@ -24,7 +24,6 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
 {
     public $password;
     public $repassword;
-    public $newpassword;
     public $oldpassword;
     //添加管理员时使用
     const SCENARIO_ADD = 'add';

@@ -48,6 +48,8 @@ AppAsset::register($this);
                 ['label' => '商品列表', 'url' => ['/goods/index/']],
                 ['label' => '员工管理', 'url' => ['/admin/index/']],
                 ['label' => '修改密码', 'url' => ['/admin/edit-pwd/']],
+                ['label' => '权限管理', 'url' => ['/rbac/permission-index/']],
+                ['label' => '角色管理', 'url' => ['/roles/index/']],
 //                ['label' => 'Logout', 'url' => ['/admin/logout']],
         ];
         $menuItems[] = '<li>'
