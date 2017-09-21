@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filter\RbacFilter;
 use backend\models\Permission;
 use backend\models\PermissionForm;
 
@@ -9,7 +10,7 @@ use backend\models\PermissionForm;
 class RbacController extends \yii\web\Controller
 {
     //添加权限
-    public function actionAddPermission(){
+    public function actionAdd(){
         //提交表单
         $permission = new PermissionForm();
         $permission->scenario = PermissionForm::SCENARIO_ADD;
@@ -25,14 +26,14 @@ class RbacController extends \yii\web\Controller
                 //添加权限
                 $auth->add($perm);
                 \Yii::$app->session->setFlash('success','添加成功');
-                return $this->redirect(['permission-index']);
+                return $this->redirect(['index']);
             }
         }
         return $this->render('add',['permission'=>$permission]);
 
     }
     //权限列表
-    public function actionPermissionIndex()
+    public function actionIndex()
     {
         $auth = \Yii::$app->authManager;
         $permissions = $auth->getPermissions();
@@ -54,6 +55,7 @@ class RbacController extends \yii\web\Controller
         $request = \Yii::$app->request;
         if($request->isPost){
             $model->load($request->post());
+            //如果修改角色,就调用验证规则
             if($oldname != $model->name){
                 $model->scenario = PermissionForm::SCENARIO_ADD;
             }
@@ -63,10 +65,10 @@ class RbacController extends \yii\web\Controller
                 $perm = $auth->createPermission($model->name);
                 //添加权限描述
                 $perm->description = $model->description;
-                //添加权限
+                //修改权限
                 $auth->update($oldname,$perm);
                 \Yii::$app->session->setFlash('success','修改成功');
-                return $this->redirect(['permission-index']);
+                return $this->redirect(['index']);
             }
         }
         return $this->render('add',['permission'=>$model]);
@@ -83,5 +85,18 @@ class RbacController extends \yii\web\Controller
             return 'false';
         }
     }
+    //测试
+    public function actionTest(){
+        return $this->render('test');
+    }
 
+    //过滤
+    public function behaviors(){
+        return [
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+                'except'=>['login','logout','captcha'],
+            ]
+        ];
+    }
 }

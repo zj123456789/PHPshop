@@ -19,9 +19,10 @@ return [
             'csrfParam' => '_csrf-backend',
         ],
         'user' => [
-            'loginUrl'=>'http://admin.yii2shop.com/admin/login',
+//            'loginUrl'=>'http://admin.yii2shop.com/admin/login',
             'identityClass' => \backend\models\Admin::className(),
             'enableAutoLogin' => true,
+            'loginUrl'=>'admin/login',
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
         ],
         'session' => [

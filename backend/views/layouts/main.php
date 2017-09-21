@@ -29,7 +29,7 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => '京东商城',
+        'brandLabel' => '京东',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -37,25 +37,13 @@ AppAsset::register($this);
     ]);
 
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/admin/login']];
+        $menuItems[] = ['label' => '登录', 'url' => ['/admin/login']];
     } else {
-        $menuItems = [
-                ['label' => 'Home', 'url' => ['/site/index']],
-                ['label' => '品牌', 'url' => ['/brand/index']],
-                ['label' => '文章分类', 'url' => ['/article-category/index/']],
-                ['label' => '文章', 'url' => ['/article/index/']],
-                ['label' => '商品分类', 'url' => ['/goods-category/index/']],
-                ['label' => '商品列表', 'url' => ['/goods/index/']],
-                ['label' => '员工管理', 'url' => ['/admin/index/']],
-                ['label' => '修改密码', 'url' => ['/admin/edit-pwd/']],
-                ['label' => '权限管理', 'url' => ['/rbac/permission-index/']],
-                ['label' => '角色管理', 'url' => ['/roles/index/']],
-//                ['label' => 'Logout', 'url' => ['/admin/logout']],
-        ];
+        $menuItems =  Yii::$app->user->identity->getMenus();
         $menuItems[] = '<li>'
             . Html::beginForm(['/admin/logout'], 'post')
             . Html::submitButton(
-                'Logout (管理员:' . Yii::$app->user->identity->username . ')',
+                '注销 (管理员:' . Yii::$app->user->identity->username . ')',
                 ['class' => 'btn btn-link logout']
             )
             . Html::endForm()

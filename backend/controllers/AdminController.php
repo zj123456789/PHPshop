@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\filter\RbacFilter;
 use backend\models\Admin;
 use backend\models\AdminEdit;
 use backend\models\LoginForm;
@@ -34,8 +35,23 @@ class AdminController extends \yii\web\Controller
             $model->load($request->post());
             //验证数据
             if($model->validate()){
+                $auth = \Yii::$app->authManager;
+                $rolesNames = $model->roles;
+//                var_dump($rolesNames);exit;
                 //beforeSave方法在保存之前自动调用
                 $model->save();
+                $userId = $model->id;
+                //如果有选角色
+                if($rolesNames){
+                    //添加角色
+                    foreach ($rolesNames as $name){
+                        $role = $auth->getRole($name);
+//                var_dump($userId);exit;
+                        $auth->assign($role,$userId);
+                }
+                }
+
+
                 \Yii::$app->session->setFlash('seccess','添加成功');
                 return $this->redirect(['admin/index']);
             }
@@ -47,6 +63,12 @@ class AdminController extends \yii\web\Controller
     public function actionEdit($id){
         //实例化表单模型
         $model = Admin::findOne(['id'=>$id]);
+        $auth = \Yii::$app->authManager;
+        //找到该用户所有的已有角色
+        $roles = $auth->getRolesByUser($id);
+//        var_dump(array_keys($roles));exit;
+        //交给模型回显
+        $model->roles = array_keys($roles);
         //实例化请求模型
         $request = new Request();
         if($request->isPost){
@@ -54,8 +76,30 @@ class AdminController extends \yii\web\Controller
             $model->load($request->post());
             //验证数据
             if($model->validate()){
+                //beforeSave方法在保存之前自动调用
                 $model->save();
-                \Yii::$app->session->setFlash('seccess','修改成功');
+                $userId = $model->id;
+                //移除用户已有的角色 如果角色存在
+//                var_dump($roles);exit;
+                if($roles){
+                    foreach ($roles as $k=>$v){
+                        $role1 = $auth->getRole($k);
+                        $auth->revoke($role1,$userId);
+                    }
+                }
+//                var_dump($roles);exit;
+                //赋予角色名
+//                var_dump($model->roles);exit;
+                $rolesName = $model->roles;
+//                var_dump($rolesName);exit;
+                if($rolesName){
+                    //添加角色
+                    foreach ($rolesName as $name){
+                        $role = $auth->getRole($name);
+                        $auth->assign($role,$userId);
+                    }
+                }
+                \Yii::$app->session->setFlash('seccess','添加成功');
                 return $this->redirect(['admin/index']);
             }
         }
@@ -66,7 +110,8 @@ class AdminController extends \yii\web\Controller
 
         $id = \Yii::$app->request->post('id');
         $model = Admin::findOne(['id'=>$id]);
-
+        $auth = \Yii::$app->authManager;
+        $auth->revokeAll($id);
         if($model->delete()){
             return 'true';
         }else{
@@ -115,7 +160,6 @@ class AdminController extends \yii\web\Controller
             ]
         ];
     }
-
     //验证是否游客
    /* public function isGuest(){
         if(\Yii::$app->user->isGuest){
@@ -126,21 +170,9 @@ class AdminController extends \yii\web\Controller
     //过滤
     public function behaviors(){
         return [
-            'acf'=>[
-                'class'=>AccessControl::className(),
-                'except'=>['login'],
-                'rules'=>[
-                    [
-                    'allow'=>true,//允许
-                    'actions'=>['login','index','captcha'],//操作
-                    'roles'=>['?']//未登录  @已登录
-                    ],
-                    [
-                        'allow'=>true,//允许
-                        'actions'=>[],//操作
-                        'roles'=>['@']//已登录
-                    ]
-                ],
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+                'except'=>['login','logout','captcha','error'],
             ]
         ];
     }

@@ -1,5 +1,6 @@
 <?php
 namespace backend\controllers;
+use backend\filter\RbacFilter;
 use backend\models\ArticleCategory;
 use yii\data\Pagination;
 use yii\filters\AccessControl;
@@ -68,23 +69,12 @@ class ArticleCategoryController extends Controller{
     //过滤
     public function behaviors(){
         return [
-            'acf'=>[
-                'class'=>AccessControl::className(),
-                'except'=>['login'],
-                'rules'=>[
-                    [
-                        'allow'=>true,//允许
-                        'actions'=>['login','index','captcha'],//操作
-                        'roles'=>['?']//未登录  @已登录
-                    ],
-                    [
-                        'allow'=>true,//允许
-                        'actions'=>[],//操作
-                        'roles'=>['@']//已登录
-                    ]
-                ],
+            'rbac'=>[
+                'class'=>RbacFilter::className(),
+                'except'=>['login','logout','captcha'],
             ]
         ];
     }
+
 
 }

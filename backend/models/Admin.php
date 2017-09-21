@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 
 /**
@@ -25,6 +26,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     public $password;
     public $repassword;
     public $oldpassword;
+    public $roles;
     //添加管理员时使用
     const SCENARIO_ADD = 'add';
     //管理员自己修改密码时使用
@@ -37,6 +39,29 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return 'admin';
     }
+    //导航菜单
+    public function getMenus(){
+        //找到上级分类为0的所有菜单
+        $menus = Menu::find()->where(['parent_id'=>0])->all();
+        $menuItems = [];
+        foreach ($menus as $menu){
+//                    var_dump($menu);exit;
+            $items=[];
+            //找到下一级菜单
+            $children = Menu::find()->where(['parent_id'=>$menu->id])->all();
+            foreach ($children as $child){
+                //如果有权限才加进去
+               if(Yii::$app->user->can($child->root)){
+                   $items[] = ['label'=>$child->name,'url'=>[$child->root]];
+               }
+            }
+            if($items){
+                $menuItems[] = ['label'=>$menu->name,'items'=>$items];
+            }
+
+        }
+        return $menuItems;
+    }
     /**
      * @inheritdoc
      */
@@ -48,12 +73,18 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             [['repassword','password'],'required','on'=>[self::SCENARIO_ADD,self::SCENARIO_EDIT]],//确认密码和密码
             [['oldpassword'],'required','on'=>[self::SCENARIO_EDIT]],// 旧密码
 
-            ['newpassword','editpwd'],//调用该方法验证旧密码
+            ['oldpassword','editpwd'],//调用该方法验证旧密码
             [['status'], 'integer'],
             ['username','unique','message'=>'用户名已存在'],
             ['email','unique','message'=>'邮箱已存在'],
+            ['roles','safe'],
             [['username', 'password', 'email'], 'string', 'max' => 255],
         ];
+    }
+    //角色回显
+    public static function Roles(){
+        $roles = \Yii::$app->authManager->getRoles();
+        return ArrayHelper::map($roles,'name','description');
     }
     //修改密码
     public function editpwd(){
@@ -104,6 +135,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
             'last_login_ip' => '最后登录ip',
             'repassword'=>'确认密码',
             'oldpassword'=>'旧密码',
+            'roles'=>'角色',
         ];
     }
 

@@ -4,7 +4,7 @@
         margin-bottom: 11px;
     }
 </style>
-<div><a href="<?=\yii\helpers\Url::to(['goods/add'])?>" class="btn btn-success">添加品牌</a></div>
+<div><a href="<?=\yii\helpers\Url::to(['goods/add'])?>" class="btn btn-success">添加商品</a></div>
 <br>
 <?php
 $form = \yii\bootstrap\ActiveForm::begin([

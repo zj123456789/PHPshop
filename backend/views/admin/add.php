@@ -11,6 +11,8 @@ echo $form->field($model,'repassword')->passwordInput();
 echo $form->field($model,'email')->textInput(['type'=>'email']);
 //商品状态
 echo $form->field($model,'status')->inline(['type'=>true])->radioList(['1'=>'正常','0'=>'隐藏']);
+//角色
+echo $form ->field($model,'roles')->inline(['type'=>'true'])->checkboxList(\backend\models\Admin::Roles());
 echo yii\bootstrap\Html::submitButton('提交',['class'=>'btn btn-info']);
 //结束表单
 yii\bootstrap\ActiveForm::end();
