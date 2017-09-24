@@ -33,6 +33,8 @@
                             [<a href="<?=\yii\helpers\Url::to(['member/logout'])?>">注销</a>] [<a href="<?=\yii\helpers\Url::to(['goods-category/index'])?>">商城首页</a>]
 
                     </li>
+                    <li class="line">|</li>
+                    <li>[<a href="<?=\yii\helpers\Url::to(['cart/cart'])?>">我的购物车</a>]</li>
 					<li class="line">|</li>
 					<li>[<a href="<?=\yii\helpers\Url::to(['order/order-list'])?>">我的订单</a>]</li>
 					<li class="line">|</li>

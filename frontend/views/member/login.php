@@ -27,6 +27,8 @@
                         ['<a href="<?=\yii\helpers\Url::to(['member/regist'])?>">免费注册</a>']
                         [<a href="<?=\yii\helpers\Url::to(['goods-category/index'])?>">商城首页</a>]
                         </li>
+                    <li class="line">|</li>
+                    <li>[<a href="<?=\yii\helpers\Url::to(['cart/cart'])?>">我的购物车</a>]</li>
 					<li class="line">|</li>
 					<li>我的订单</li>
 					<li class="line">|</li>
