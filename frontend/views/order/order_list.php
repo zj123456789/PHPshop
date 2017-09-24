@@ -505,13 +505,16 @@
 					</thead>
 					<tbody>
                         <?php foreach ($orders as $order):?>
-                        <?php foreach ($order->goods as $goods):?>
+
 						<tr>
 							<td><a href=""><?=$order->id?></a></td>
-							<td><a href="<?=\yii\helpers\Url::to(['goods-category/detail','goods_id'=>$goods->goods_id])?>">
+							<td>
+                                <?php foreach ($order->goods as $goods):?>
+                                <a href="<?=\yii\helpers\Url::to(['goods-category/detail','goods_id'=>$goods->goods_id])?>">
                                     <img src="<?=$goods->logo?>" alt="" />
-
-                                </a></td>
+                                </a>
+                                <?php endforeach;?>
+                            </td>
 							<td><?=$order->name?></td>
 							<td>￥<?=$goods->price?>.00&emsp;<?=$order->payment_name?> </td>
 							<td><?=date('Y-m-d H:i:s',$order->create_time)?></td>
@@ -530,7 +533,7 @@
                                 ?></td>
 							<td><a href="">查看</a> | <a href="">删除</a></td>
 						</tr>
-                            <?php endforeach;?>
+
                     <?php endforeach;?>
 					</tbody> 
 				</table>
