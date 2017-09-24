@@ -15,7 +15,7 @@ class m170919_063944_create_address_table extends Migration
         $this->createTable('address', [
             'id' => $this->primaryKey(),
             'username'=>$this->string(20)->comment('收货人'),
-            'tel'=>$this->integer()->comment('电话'),
+            'tel'=>$this->string()->comment('电话'),
             'province'=>$this->string()->comment('省'),
             'city'=>$this->string()->comment('市'),
             'area'=>$this->string()->comment('区'),

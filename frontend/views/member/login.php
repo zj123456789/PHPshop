@@ -23,7 +23,10 @@
 			</div>
 			<div class="topnav_right fr">
 				<ul>
-					<li>您好，欢迎来到京西！[<a href="login.html">登录</a>] [<a href="regist.html">免费注册</a>] </li>
+					<li>
+                        ['<a href="<?=\yii\helpers\Url::to(['member/regist'])?>">免费注册</a>']
+                        [<a href="<?=\yii\helpers\Url::to(['goods-category/index'])?>">商城首页</a>]
+                        </li>
 					<li class="line">|</li>
 					<li>我的订单</li>
 					<li class="line">|</li>

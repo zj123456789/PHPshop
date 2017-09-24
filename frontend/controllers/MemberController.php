@@ -5,6 +5,7 @@ namespace frontend\controllers;
 
 use Behat\Gherkin\Loader\YamlFileLoader;
 use frontend\models\Address;
+use frontend\models\Cart;
 use frontend\models\Locations;
 use frontend\models\LoginForm;
 
@@ -42,9 +43,30 @@ class MemberController extends \yii\web\Controller
     public function actionSms(){
         $tel = \Yii::$app->request->post('tel');
         $code = rand(1000,9999);
+
+        $demo = new SmsDemo(
+            "LTAIkyZwVVq1knti",//AK
+            "zz4anOAEKhMhSLQpBqmVZI283RcPHv" //SK
+        );
+//SmsDemo::sendSms stdClass Object ( [Message] => OK [RequestId] => 1E730CC7-FFE7-45BC-AAFE-AD6BD9BE80B9 [BizId] => 296904805887351612^0 [Code] => OK )
+        echo "SmsDemo::sendSms\n";
+        $response = $demo->sendSms(
+            "朱钧的茶馆", // 短信签名
+            "SMS_97980003", // 短信模板编号
+            $tel, // 短信接收者
+
+           $code= Array(  // 短信模板中字段的值
+                "code"=>rand(10000,99999),
+            )
+        );
+//        print_r($response);
         $redis = new \Redis();
         $redis->connect('127.0.0.1');
-        $redis->set('code'.$tel,$code);
+        $redis->set('code'.$tel,implode($code));
+    }
+    //短信测试
+    public function actionTest(){
+        $code = rand(1000,9999);
         $demo = new SmsDemo(
             "LTAIkyZwVVq1knti",//AK
             "zz4anOAEKhMhSLQpBqmVZI283RcPHv" //SK
@@ -60,7 +82,7 @@ class MemberController extends \yii\web\Controller
                 "code"=>$code,
             )
         );
-        print_r($response);
+            print_r($response);
     }
     //修改地址
     public function actionEdit($id){
@@ -111,7 +133,9 @@ class MemberController extends \yii\web\Controller
                 $model->city = $model->cmbCity;
                 $model->area = $model->cmbArea;
                 $model->user_id = \Yii::$app->user->identity->getId();
+//                var_dump($model->tel);exit;
                 $model->save();
+//                var_dump($model->tel);exit;
                 \Yii::$app->session->setFlash('success','添加成功');
                 return $this->redirect(['address']);
             }
@@ -131,6 +155,8 @@ class MemberController extends \yii\web\Controller
                 //登录认证
                 $denglu = $model->login();
                 if ($denglu) {
+                    //同步cookie数据到数据库
+                    $this->Tongbu();
                     \Yii::$app->session->setFlash('success', '登录成功');
                     //跳转
                     return $this->redirect(['goods-category/index']);
@@ -139,6 +165,34 @@ class MemberController extends \yii\web\Controller
         }
 
         return $this->renderPartial('login');
+    }
+    //同步操作
+    public function Tongbu(){
+        //   1.将cookie中数据取出来
+        $cookies = \Yii::$app->request->cookies;
+        $value = $cookies->getValue('cart');
+        if($value){
+            $carts = unserialize($value);
+            //2.遍历成键值对的数组格式[goods_id=>amount]
+            foreach ($carts as $goods_id=>$amount){
+                //3.根据商品id和用户id去查询数据库该商品是否存在
+                $member_id = \Yii::$app->user->getId();
+                $goods = Cart::findOne(['goods_id'=>$goods_id,'member_id'=>$member_id]);
+                if($goods){
+                    //4.如果存在就更新数量
+                    $goods->amount += $amount;
+                }else{
+                    //5.不存在就新增一条数据
+                    $goods = new Cart();
+                    $goods->goods_id = $goods_id;
+                    $goods->amount = $amount;
+                    $goods->member_id = $member_id;
+                    $goods->save();
+                }
+            }
+        }
+        //6.清除cookie
+        \Yii::$app->response->cookies->remove('cart');
     }
     //注销
     public function actionLogout(){

@@ -92,7 +92,9 @@ class GoodsController extends \yii\web\Controller
                 //保存到详情表
                 $model_intro->goods_id=$model->id;
                 $model_intro->save();
+
                 \yii::$app->session->setFlash('seccess','添加成功');
+
                 return $this->redirect(['goods/index']);
             }else{
                 var_dump($model->getErrors());
