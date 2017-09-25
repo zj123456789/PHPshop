@@ -852,7 +852,7 @@
 
 						<!--  评论表单 start-->
 						<div class="comment_form mt20">
-							<form action="">
+							<form action="<?=\yii\helpers\Url::to(['cart/cart'])?>">
 								<ul>
 									<li>
 										<label for=""> 评分：</label>
