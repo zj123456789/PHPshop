@@ -83,8 +83,6 @@
                 </p>
                 <?php endforeach;?>
 				</div>
-
-
 			</div>
 			<!-- 收货人信息  end-->
 
@@ -105,7 +103,7 @@
                         <?php foreach($delivery as $k=>$row):?>
 							<tr class="cur" data-id="<?=$row[1]?>">
 								<td>
-									<input type="radio" class="yunfei" name="delivery_id"  value="<?=$k?>"/><?=$row[0] ?>
+									<input type="radio" class="yunfei" name="delivery_id"  value="<?=($k==1)?"":''?>"/><?=$row[0] ?>
 								</td>
 								<td><?=$row[1]?></td>
 								<td><?=$row[2]?></td>
@@ -257,43 +255,18 @@
 
 <script type="text/javascript">
     $().ready(function() {
-        //验证规则
-        $("#signupForm").validate({
-            errorElement: 'span',
-            rules: {
-                payment_id: {
-                    required: true
-                },
-                delivery_id: {
-                    required: true
-                },
-                address_id: {
-                    required: true
-                }
-            },
-            messages: {
-                address_id: {
-                    required: "地址必填"
-                },
-                delivery_id: {
-                    required: "送货方式必填"
-                },
-                payment_id: {
-                    required: "支付方式必填"
-                }
-            }
-        };
-    $('.yunfei').click(function () {
-        //运费
-        var money = $(this).closest('tr').attr('data-id');
-        console.log(money);
-        $('#money').text('￥'+money+'.00');
-        //商品总费用
-        var total = $('.total').attr('id');
-        console.log(total);
-        $('.mon').text('￥'+(parseInt(total)+parseInt(money)))
+        $('.yunfei').click(function () {
+            //运费
+            var money = $(this).closest('tr').attr('data-id');
+            console.log(money);
+            $('#money').text('￥' + money + '.00');
+            //商品总费用
+            var total = $('.total').attr('id');
+            console.log(total);
+            $('.mon').text('￥' + (parseInt(total) + parseInt(money)))
 
-    });
+        });
+    })
 
 </script>
 </html>
