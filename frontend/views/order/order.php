@@ -77,9 +77,9 @@
 			<div class="address">
 				<h3>收货人信息</h3>
 				<div class="address_info">
-                <?php foreach ($address as $add):?>
+                <?php foreach ($address as $k=>$add):?>
 				<p>
-					<input type="radio" value="<?=$add->id?>" name="address_id"/><?=$add->username?>&emsp;<?=$add->tel?>&emsp;<?=$add->province?>&emsp;<?=$add->city?>&emsp;<?=$add->area?>&emsp;<?=$add->address?>
+					<input type="radio" name="address_id" value="<?=$add->id?>" <?=$k==1?'checked':''?>/><?=$add->username?>&emsp;<?=$add->tel?>&emsp;<?=$add->province?>&emsp;<?=$add->city?>&emsp;<?=$add->area?>&emsp;<?=$add->address?>
                 </p>
                 <?php endforeach;?>
 				</div>
@@ -102,8 +102,9 @@
 						<tbody>
                         <?php foreach($delivery as $k=>$row):?>
 							<tr class="cur" data-id="<?=$row[1]?>">
+
 								<td>
-									<input type="radio" class="yunfei" name="delivery_id"  value="<?=($k==1)?"":''?>"/><?=$row[0] ?>
+									<input type="radio" class="yunfei" name="delivery_id"  value="<?=$k?>" <?=$k==1?'checked':''?>/><?=$row[0] ?>
 								</td>
 								<td><?=$row[1]?></td>
 								<td><?=$row[2]?></td>
@@ -125,7 +126,7 @@
 					<table>
                         <?php foreach($payment as $k=>$one):?>
 						<tr class="cur">
-							<td class="col1"><input type="radio" name="payment_id" value="<?=$k?>"/><?=$one[0]?></td>
+							<td class="col1"><input type="radio" name="payment_id" value="<?=$k?>" <?=$k==2?'checked':''?>/><?=$one[0]?></td>
 							<td class="col2"><?=$one[1]?></td>
 						</tr>
 					    <?php endforeach;?>
