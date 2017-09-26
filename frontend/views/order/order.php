@@ -201,7 +201,7 @@
 									</li>
 									<li>
 										<span>运费：</span>
-										<em id="money">￥</em>
+										<em id="money">￥10.00</em>
 									</li>
 									<li>
 										<span>应付总额：</span>
