@@ -608,9 +608,8 @@
 						<li><span>上架时间：</span><?=date('Y-m-d',$model->create_time)?></li>
 						<li class="star"><span>商品评分：</span> <strong></strong><a href="">(已有21人评价)</a></li> <!-- 此处的星级切换css即可 默认为5星 star4 表示4星 star3 表示3星 star2表示2星 star1表示1星 -->
 					</ul>
-					<form action="<?=\yii\helpers\Url::to(['cart/cart'])?>" method="get" class="choose">
+					<form action="<?=\yii\helpers\Url::to(['cart/addcart'])?>" method="get" class="choose">
 						<ul>
-							
 							<li>
 								<dl>
 									<dt>购买数量：</dt>
@@ -621,7 +620,6 @@
 									</dd>
 								</dl>
 							</li>
-
 							<li>
 								<dl>
 									<dt>&nbsp;</dt>
