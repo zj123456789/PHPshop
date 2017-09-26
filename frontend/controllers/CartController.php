@@ -84,7 +84,7 @@ class CartController extends \yii\web\Controller
         }
         return $this->renderPartial('cart',['models'=>$models,'cart'=>$cart]);
     }
-    //ajax
+    //ajax加减购物车数量  web下的js下的cart1.js发起
     public function actionAjax(){
         $goods_id = \Yii::$app->request->post('goods_id');
         $amount = \Yii::$app->request->post('amount');
@@ -124,8 +124,9 @@ class CartController extends \yii\web\Controller
             $cookies = \Yii::$app->request->cookies;
             $value = $cookies->getValue('cart');
             if($value){
-                $carts = unserialize($value);
+                $carts = unserialize($value);//数组格式
                 unset($carts[$goods_id]);
+                //删除后保存
                 $cookies = \Yii::$app->response->cookies;
                 $cookie = new Cookie();
                 $cookie->name = 'cart';
