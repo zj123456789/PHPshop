@@ -40,7 +40,7 @@ class Member extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['username','password','email','tel','repassword'],'required'],
+            [['username','password','email','tel'],'required'],
             ['repassword', 'compare', 'compareAttribute'=>'password'],
             ['sms','validateSms'],//手机验证码
             [['username','email','tel'],'unique'],
@@ -48,8 +48,19 @@ class Member extends \yii\db\ActiveRecord implements IdentityInterface
             [['auth_key'], 'string', 'max' => 32],
             [['password_hash', 'email'], 'string', 'max' => 100],
             [['tel'], 'string', 'max' => 11],
-            ['checkcode','captcha','captchaAction'=>'site/captcha'],
+//            ['checkcode','captcha','captchaAction'=>'site/captcha'],
         ];
+    }
+    //修改密码
+    public function editpwd(){
+        //数据库密码
+        $password_hash = $this->password_hash;
+        //输入旧密码
+        $oldpassword = Yii::$app->security->generatePasswordHash($this->oldpassword);
+//        var_dump($password);exit;
+        if($oldpassword != $password_hash){
+            return $this->addError('password','旧密码错误');
+        }
     }
     //验证手机验证码
     public function validateSms(){

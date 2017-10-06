@@ -15,7 +15,7 @@ class LoginForm extends ActiveRecord {
         return [
             [['username','password'],'required'],
             ['remember','safe'],
-            ['checkcode','captcha','captchaAction'=>'site/captcha'],
+//            ['checkcode','captcha','captchaAction'=>'site/captcha'],
         ];
     }
     public function attributeLabels()

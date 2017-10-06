@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use backend\models\Goods;
 use backend\models\GoodsCategory;
 use backend\models\GoodsGallery;
+use frontend\models\SphinxClient;
 use yii\data\Pagination;
 
 class GoodsCategoryController extends \yii\web\Controller
@@ -16,6 +17,7 @@ class GoodsCategoryController extends \yii\web\Controller
         //再遍历一次parent_id=上级分类id (三级分类)
         //之后根据分类id去商品表把商品列出来
         //根据商品id把相册显示出来
+
 
         $categorys = GoodsCategory::find()->where(['parent_id'=>0])->all();
 
@@ -50,6 +52,40 @@ class GoodsCategoryController extends \yii\web\Controller
     //到地址页面
     public function actionAddress(){
         return $this->redirect(['member/address']);
+    }
+    //搜索
+    public function actionSearch($keyword){
+
+        $cl = new SphinxClient();
+        $cl->SetServer ( '127.0.0.1', 9312);
+
+        $cl->SetConnectTimeout ( 10 );//超时
+        $cl->SetArrayResult ( true );//返回结果格式
+
+        $cl->SetMatchMode ( SPH_MATCH_EXTENDED2);//匹配模式
+        $cl->SetLimits(0, 1000);//设置返回结果
+
+        $res = $cl->Query($keyword,'goods');
+        $ids=[];
+        if(isset($res['matches'])){
+            //找到
+            foreach ($res['matches'] as $match){
+                $ids[]=$match['id'];
+            }
+        }//没找到不处理
+        //根据id查出商品
+        $model = Goods::find();
+        if($keyword){
+            $model->where(['in','id',$ids]);
+        }
+        $pager = new Pagination([
+            'totalCount'=>$model->count(),
+            'defaultPageSize'=>2
+        ]);
+        $goods = $model->limit($pager->limit)->offset($pager->offset)->all();
+        return $this->renderPartial('list',['pager'=>$pager,'models'=>$goods]);
+
+
     }
 
 }

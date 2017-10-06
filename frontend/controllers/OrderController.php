@@ -8,6 +8,8 @@ use frontend\models\Cart;
 use frontend\models\Order;
 use frontend\models\OrderGoods;
 use yii\db\Exception;
+use EasyWeChat\Foundation\Application;
+use Endroid\QrCode\QrCode;
 
 class OrderController extends \yii\web\Controller
 {
@@ -51,7 +53,7 @@ class OrderController extends \yii\web\Controller
             $order->city = $addr->city;//市
             $order->area = $addr->area;//区
             $order->address = $addr->address;//具体地址
-            $order->memeber_id = $member_id;//当前用户id
+            $order->member_id = $member_id;//当前用户id
             //------送货方式
             $delivery = Order::$delivery[$delivery_id];
             $order->delivery_id = $delivery_id;
@@ -130,5 +132,42 @@ class OrderController extends \yii\web\Controller
         $cart =Cart::findOne(['id'=>14]);
         var_dump($cart->goods);
     }
+//微信支付
+    public function actionPay(){
 
+
+//支付配置
+
+        $app = new Application(\Yii::$app->params['wechat']);
+        $payment = $app->payment;
+
+        //创建微信订单
+        $attributes = [
+            'trade_type'       => 'NATIVE', // JSAPI，NATIVE，APP..扫码支付必须是NATIVE
+            'body'             => 'iPad mini 16G 白色',//商品描述
+            'detail'           => 'iPad mini 16G 白色',//商品详情
+            'out_trade_no'     => '1217752501201407033233368018',
+            'total_fee'        => 538800, // 单位：分
+            'notify_url'       => 'http://xxx.com/order-notify', // 支付结果通知网址，如果不设置则会使用配置里的默认地址
+            //'openid'           => '当前用户的 openid', // trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识，
+            // ...
+        ];
+        $order = new \EasyWeChat\Payment\Order($attributes);
+        //统一下单
+        $result = $payment->prepare($order);
+//        var_dump($result);exit;
+        if ($result->return_code == 'SUCCESS' && $result->result_code == 'SUCCESS'){
+//            $prepayId = $result->prepay_id;
+            $code_url = $result->code_url;
+        }
+        return $this->renderPartial('pay',['order'=>$order,'code_url'=>$code_url]);
+    }
+    //测试二维码
+    public function actionQr($content){
+
+        $qrCode = new QrCode($content);
+
+        header('Content-Type: '.$qrCode->getContentType());
+        echo $qrCode->writeString();
+    }
 }

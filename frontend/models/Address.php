@@ -35,7 +35,7 @@ class Address extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['username','tel','cmbProvince','cmbCity','cmbArea'],'required'],
+            [['username','tel','cmbProvince','cmbCity','cmbArea','address'],'required'],
             [['tel'], 'integer'],
             [['username'], 'string', 'max' => 20],
             [['province', 'city', 'area', 'address', 'default_address'], 'string', 'max' => 255],

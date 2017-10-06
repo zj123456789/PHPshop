@@ -531,7 +531,7 @@
                                     echo "完成";
                                 }
                                 ?></td>
-							<td><a href="">查看</a> | <a href="">删除</a></td>
+							<td><a href="<?=\yii\helpers\Url::to(['order/pay'])?>">付款</a> | <a href="">查看</a> | <a href="">删除</a></td>
 						</tr>
 
                     <?php endforeach;?>
