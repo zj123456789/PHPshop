@@ -21,4 +21,7 @@ class ArticleCategory extends ActiveRecord{
             'sort'=>'排序'
         ];
     }
+    public function getArticle(){
+        return $this->hasMany(Article::className(),['article_category_id'=>'id']);
+    }
 }

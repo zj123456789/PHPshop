@@ -28,5 +28,8 @@ class Brand extends ActiveRecord{
             'sort'=>'排序'
         ];
     }
+    public function getGoods(){
+        return $this->hasMany(Goods::className(),['brand_id'=>'id']);
+    }
 
 }
