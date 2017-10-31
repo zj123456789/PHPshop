@@ -1,4 +1,0 @@
-EditPlus生成注册码网址:
-http://demon.tw/my-work/editplus-regcode-online.html
-Windows环境下EditPlus运行Perl程序网址:
-http://www.cnblogs.com/meteoric_cry/archive/2010/11/29/1890884.html
